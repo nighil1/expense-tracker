@@ -1,39 +1,46 @@
-<!DOCTYPE html>
-<html>
-<head>
-<link rel="stylesheet" href="/static/style.css">
-</head>
-<body>
-
 <div class="dashboard">
-<h2>AI Expense Tracker</h2>
 
+<h2>🤖 AI Expense Tracker</h2>
+
+<div class="section">
+<h3>➕ Add Expense</h3>
 <form method="post">
 <input name="amount" placeholder="Amount ₹" required>
 <input name="description" placeholder="Description" required>
 <button>Add Expense</button>
 </form>
+</div>
 
+<div class="section">
+<h3>💰 Add Income</h3>
 <form method="post" action="/add_income">
 <input name="income" placeholder="Income ₹" required>
 <button>Add Income</button>
 </form>
+</div>
 
-<h3>Totals</h3>
+<div class="section">
+<h3>📊 Totals</h3>
 <p>Income: ₹{{income}}</p>
 <p>Expense: ₹{{expense}}</p>
+</div>
 
-<h3>AI Feedback</h3>
+<div class="section">
+<h3>🧠 AI Feedback</h3>
 <p>{{feedback}}</p>
+</div>
 
-<h3>Summary</h3>
+<div class="section">
+<h3>📂 Category Summary</h3>
 <ul>
 {% for s in summary %}
 <li>{{s[0]}} - ₹{{s[1]}}</li>
 {% endfor %}
 </ul>
+</div>
 
-<h3>Expenses</h3>
+<div class="section">
+<h3>🧾 Expenses</h3>
 <table>
 <tr><th>Amt</th><th>Desc</th><th>Cat</th><th>Delete</th></tr>
 {% for e in expenses %}
@@ -41,17 +48,14 @@
 <td>{{e[1]}}</td>
 <td>{{e[2]}}</td>
 <td>{{e[3]}}</td>
-<td><a href="/delete/{{e[0]}}">X</a></td>
+<td><a href="/delete/{{e[0]}}">❌</a></td>
 </tr>
 {% endfor %}
 </table>
+</div>
 
-<div class="logout">
-<a href="/dashboard">Refresh</a> |
-<a href="/logout">Logout</a>
+<div style="text-align:center;margin-top:10px;">
+<a href="/dashboard">Refresh</a> | <a href="/logout">Logout</a>
 </div>
 
 </div>
-
-</body>
-</html>
