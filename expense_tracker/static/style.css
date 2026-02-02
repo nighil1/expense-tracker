@@ -1,74 +1,57 @@
-* {
-    box-sizing: border-box;
-    font-family: Arial, sans-serif;
-}
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
 
-body {
-    background: linear-gradient(120deg, #4e54c8, #8f94fb);
-    min-height: 100vh;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+<div class="dashboard">
+<h2>AI Expense Tracker</h2>
 
-.card, .dashboard {
-    background: white;
-    padding: 25px;
-    border-radius: 10px;
-    width: 90%;
-    max-width: 900px;
-}
+<form method="post">
+<input name="amount" placeholder="Amount ₹" required>
+<input name="description" placeholder="Description" required>
+<button>Add Expense</button>
+</form>
 
-.card {
-    max-width: 360px;
-}
+<form method="post" action="/add_income">
+<input name="income" placeholder="Income ₹" required>
+<button>Add Income</button>
+</form>
 
-h2, h3 {
-    text-align: center;
-}
+<h3>Totals</h3>
+<p>Income: ₹{{income}}</p>
+<p>Expense: ₹{{expense}}</p>
 
-input {
-    width: 100%;
-    padding: 10px;
-    margin: 8px 0;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-}
+<h3>AI Feedback</h3>
+<p>{{feedback}}</p>
 
-button {
-    width: 100%;
-    padding: 10px;
-    background: #4e54c8;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
+<h3>Summary</h3>
+<ul>
+{% for s in summary %}
+<li>{{s[0]}} - ₹{{s[1]}}</li>
+{% endfor %}
+</ul>
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-}
+<h3>Expenses</h3>
+<table>
+<tr><th>Amt</th><th>Desc</th><th>Cat</th><th>Delete</th></tr>
+{% for e in expenses %}
+<tr>
+<td>{{e[1]}}</td>
+<td>{{e[2]}}</td>
+<td>{{e[3]}}</td>
+<td><a href="/delete/{{e[0]}}">X</a></td>
+</tr>
+{% endfor %}
+</table>
 
-th {
-    background: #4e54c8;
-    color: white;
-}
+<div class="logout">
+<a href="/dashboard">Refresh</a> |
+<a href="/logout">Logout</a>
+</div>
 
-th, td {
-    padding: 10px;
-    border: 1px solid #ddd;
-    text-align: center;
-}
+</div>
 
-a {
-    text-decoration: none;
-    color: #4e54c8;
-}
-
-.logout {
-    text-align: center;
-    margin-top: 15px;
-}
+</body>
+</html>
