@@ -1,57 +1,95 @@
-<!DOCTYPE html>
-<html>
-<head>
-<link rel="stylesheet" href="/static/style.css">
-</head>
-<body>
+* {
+    box-sizing: border-box;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
 
-<div class="dashboard">
-<h2>AI Expense Tracker</h2>
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f172a, #020617);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #e5e7eb;
+}
 
-<form method="post">
-<input name="amount" placeholder="Amount ₹" required>
-<input name="description" placeholder="Description" required>
-<button>Add Expense</button>
-</form>
+.card, .dashboard {
+    background: #111827;
+    padding: 28px;
+    border-radius: 14px;
+    width: 95%;
+    max-width: 420px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.6);
+}
 
-<form method="post" action="/add_income">
-<input name="income" placeholder="Income ₹" required>
-<button>Add Income</button>
-</form>
+.dashboard {
+    max-width: 950px;
+}
 
-<h3>Totals</h3>
-<p>Income: ₹{{income}}</p>
-<p>Expense: ₹{{expense}}</p>
+h2, h3 {
+    text-align: center;
+    color: #f9fafb;
+}
 
-<h3>AI Feedback</h3>
-<p>{{feedback}}</p>
+input {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 8px;
+    border: 1px solid #374151;
+    background: #020617;
+    color: white;
+    outline: none;
+    transition: 0.3s;
+}
 
-<h3>Summary</h3>
-<ul>
-{% for s in summary %}
-<li>{{s[0]}} - ₹{{s[1]}}</li>
-{% endfor %}
-</ul>
+input:focus {
+    border-color: #22c55e;
+    box-shadow: 0 0 6px #22c55e;
+}
 
-<h3>Expenses</h3>
-<table>
-<tr><th>Amt</th><th>Desc</th><th>Cat</th><th>Delete</th></tr>
-{% for e in expenses %}
-<tr>
-<td>{{e[1]}}</td>
-<td>{{e[2]}}</td>
-<td>{{e[3]}}</td>
-<td><a href="/delete/{{e[0]}}">X</a></td>
-</tr>
-{% endfor %}
-</table>
+button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(90deg,#22c55e,#16a34a);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
 
-<div class="logout">
-<a href="/dashboard">Refresh</a> |
-<a href="/logout">Logout</a>
-</div>
+button:hover {
+    transform: scale(1.02);
+    opacity: 0.9;
+}
 
-</div>
+a {
+    color: #22c55e;
+    text-decoration: none;
+}
 
-</body>
-</html>
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background: #020617;
+}
+
+th {
+    background: #16a34a;
+    color: white;
+}
+
+th, td {
+    padding: 10px;
+    border: 1px solid #1f2933;
+    text-align: center;
+}
+
+.logout {
+    text-align: center;
+    margin-top: 15px;
+}
