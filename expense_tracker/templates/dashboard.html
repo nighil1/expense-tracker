@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="dashboard">
+
+<h2>AI-Powered Expense Tracker</h2>
+
+<h3>Add Income</h3>
+<form method="post" action="/add_income">
+<input name="income" placeholder="Monthly Income (₹)" required>
+<button>Add Income</button>
+</form>
+
+<h3>Add Expense</h3>
+<form method="post">
+<input name="amount" placeholder="Amount (₹)" required>
+<input name="description" placeholder="Expense Description" required>
+<button>Add Expense</button>
+</form>
+
+<h3>Monthly Summary</h3>
+<p><b>Total Income:</b> ₹{{income_total}}</p>
+<p><b>Total Expense:</b> ₹{{monthly_total}}</p>
+
+<h3>AI Feedback</h3>
+<p><b>{{feedback}}</b></p>
+
+<h3>Category-wise Summary</h3>
+<ul>
+{% for c in category_summary %}
+<li>{{c[0]}} : ₹{{c[1]}}</li>
+{% endfor %}
+</ul>
+
+<h3>Expense History</h3>
+<table>
+<tr><th>Amount</th><th>Description</th><th>Category</th></tr>
+{% for e in expenses %}
+<tr>
+<td>₹{{e[0]}}</td>
+<td>{{e[1]}}</td>
+<td>{{e[2]}}</td>
+</tr>
+{% endfor %}
+</table>
+
+<div class="logout">
+<a href="/logout">Logout</a>
+</div>
+
+</div>
+</body>
+</html>
