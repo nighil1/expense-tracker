@@ -1,35 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Expense Tracker</title>
+
+    <!-- IMPORTANT CSS LINK -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
 <div class="dashboard">
 
 <h2>🤖 AI Expense Tracker</h2>
 
+<!-- ADD EXPENSE -->
 <div class="section">
 <h3>➕ Add Expense</h3>
 <form method="post">
-<input name="amount" placeholder="Amount ₹" required>
-<input name="description" placeholder="Description" required>
-<button>Add Expense</button>
+    <input name="amount" placeholder="Amount ₹" required>
+    <input name="description" placeholder="Description" required>
+    <button>Add Expense</button>
 </form>
 </div>
 
+<!-- ADD INCOME -->
 <div class="section">
 <h3>💰 Add Income</h3>
 <form method="post" action="/add_income">
-<input name="income" placeholder="Income ₹" required>
-<button>Add Income</button>
+    <input name="income" placeholder="Income ₹" required>
+    <button>Add Income</button>
 </form>
 </div>
 
+<!-- TOTALS -->
 <div class="section">
 <h3>📊 Totals</h3>
-<p>Income: ₹{{income}}</p>
-<p>Expense: ₹{{expense}}</p>
+<p><b>Income:</b> ₹{{income}}</p>
+<p><b>Expense:</b> ₹{{expense}}</p>
 </div>
 
+<!-- AI FEEDBACK -->
 <div class="section">
 <h3>🧠 AI Feedback</h3>
 <p>{{feedback}}</p>
 </div>
 
+<!-- SUMMARY -->
 <div class="section">
 <h3>📂 Category Summary</h3>
 <ul>
@@ -39,23 +55,38 @@
 </ul>
 </div>
 
+<!-- EXPENSE TABLE -->
 <div class="section">
 <h3>🧾 Expenses</h3>
 <table>
-<tr><th>Amt</th><th>Desc</th><th>Cat</th><th>Delete</th></tr>
+<tr>
+<th>Amount</th>
+<th>Description</th>
+<th>Category</th>
+<th>Delete</th>
+</tr>
+
 {% for e in expenses %}
 <tr>
-<td>{{e[1]}}</td>
+<td>₹{{e[1]}}</td>
 <td>{{e[2]}}</td>
 <td>{{e[3]}}</td>
-<td><a href="/delete/{{e[0]}}">❌</a></td>
+<td>
+<a href="/delete/{{e[0]}}">❌</a>
+</td>
 </tr>
 {% endfor %}
+
 </table>
 </div>
 
-<div style="text-align:center;margin-top:10px;">
-<a href="/dashboard">Refresh</a> | <a href="/logout">Logout</a>
+<!-- FOOTER -->
+<div style="text-align:center;margin-top:15px;">
+<a href="/dashboard">🔄 Refresh</a> |
+<a href="/logout">🚪 Logout</a>
 </div>
 
 </div>
+
+</body>
+</html>
