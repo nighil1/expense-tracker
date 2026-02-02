@@ -3,8 +3,11 @@
 <head>
     <title>AI Expense Tracker</title>
 
-    <!-- IMPORTANT CSS LINK -->
+    <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- CHART JS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -32,6 +35,17 @@
 </form>
 </div>
 
+<!-- GRAPHS -->
+<div class="section">
+<h3>📈 Overview</h3>
+<canvas id="barChart"></canvas>
+</div>
+
+<div class="section">
+<h3>🟢 Expense Breakdown</h3>
+<canvas id="donutChart"></canvas>
+</div>
+
 <!-- TOTALS -->
 <div class="section">
 <h3>📊 Totals</h3>
@@ -45,7 +59,7 @@
 <p>{{feedback}}</p>
 </div>
 
-<!-- SUMMARY -->
+<!-- CATEGORY SUMMARY -->
 <div class="section">
 <h3>📂 Category Summary</h3>
 <ul>
@@ -71,9 +85,7 @@
 <td>₹{{e[1]}}</td>
 <td>{{e[2]}}</td>
 <td>{{e[3]}}</td>
-<td>
-<a href="/delete/{{e[0]}}">❌</a>
-</td>
+<td><a href="/delete/{{e[0]}}">❌</a></td>
 </tr>
 {% endfor %}
 
@@ -87,6 +99,37 @@
 </div>
 
 </div>
+
+<!-- CHART SCRIPT -->
+<script>
+const income = {{income}};
+const expense = {{expense}};
+
+// BAR CHART
+new Chart(document.getElementById('barChart'), {
+    type: 'bar',
+    data: {
+        labels: ['Income', 'Expense'],
+        datasets: [{
+            label: '₹',
+            data: [income, expense],
+            backgroundColor: ['#2ecc71', '#e74c3c']
+        }]
+    }
+});
+
+// DONUT CHART
+new Chart(document.getElementById('donutChart'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Expense'],
+        datasets: [{
+            data: [expense],
+            backgroundColor: ['#27ae60']
+        }]
+    }
+});
+</script>
 
 </body>
 </html>
