@@ -122,10 +122,10 @@ new Chart(document.getElementById('barChart'), {
 new Chart(document.getElementById('donutChart'), {
     type: 'doughnut',
     data: {
-        labels: ['Expense'],
+        labels: ['Income', 'Expense'],
         datasets: [{
-            data: [expense],
-            backgroundColor: ['#27ae60']
+            data: [income, expense],
+            backgroundColor: ['#22c55e', '#ef4444']
         }]
     }
 });
