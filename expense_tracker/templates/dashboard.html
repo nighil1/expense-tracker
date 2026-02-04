@@ -1,133 +1,73 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>AI Expense Tracker</title>
-
-    <!-- CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
-    <!-- CHART JS -->
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-
 <body>
 
 <div class="dashboard">
 
-<h2>🤖 AI Expense Tracker</h2>
-
-<!-- ADD EXPENSE -->
 <div class="section">
-<h3>➕ Add Expense</h3>
-<form method="post">
-    <input name="amount" placeholder="Amount ₹" required>
-    <input name="description" placeholder="Description" required>
-    <button>Add Expense</button>
-</form>
+    <h2>Monthly Overview</h2>
+    <canvas id="barChart"></canvas>
 </div>
 
-<!-- ADD INCOME -->
-<div class="section">
-<h3>💰 Add Income</h3>
-<form method="post" action="/add_income">
-    <input name="income" placeholder="Income ₹" required>
-    <button>Add Income</button>
-</form>
+<div class="section stat">
+    <span>Income</span><strong>₹{{ income }}</strong>
 </div>
-
-<!-- GRAPHS -->
-<div class="section">
-<h3>📈 Overview</h3>
-<canvas id="barChart"></canvas>
+<div class="section stat">
+    <span>Expense</span><strong>₹{{ expense }}</strong>
 </div>
 
 <div class="section">
-<h3>🟢 Expense Breakdown</h3>
-<canvas id="donutChart"></canvas>
+    <h3>Expense Distribution</h3>
+    <canvas id="donutChart"></canvas>
 </div>
 
-<!-- TOTALS -->
 <div class="section">
-<h3>📊 Totals</h3>
-<p><b>Income:</b> ₹{{income}}</p>
-<p><b>Expense:</b> ₹{{expense}}</p>
+    <h3>AI Insight</h3>
+    <p>{{ feedback }}</p>
 </div>
 
-<!-- AI FEEDBACK -->
 <div class="section">
-<h3>🧠 AI Feedback</h3>
-<p>{{feedback}}</p>
-</div>
+    <form method="post">
+        <input name="amount" placeholder="Expense amount" required>
+        <input name="description" placeholder="Description" required>
+        <button>Add Expense</button>
+    </form>
 
-<!-- CATEGORY SUMMARY -->
-<div class="section">
-<h3>📂 Category Summary</h3>
-<ul>
-{% for s in summary %}
-<li>{{s[0]}} - ₹{{s[1]}}</li>
-{% endfor %}
-</ul>
-</div>
-
-<!-- EXPENSE TABLE -->
-<div class="section">
-<h3>🧾 Expenses</h3>
-<table>
-<tr>
-<th>Amount</th>
-<th>Description</th>
-<th>Category</th>
-<th>Delete</th>
-</tr>
-
-{% for e in expenses %}
-<tr>
-<td>₹{{e[1]}}</td>
-<td>{{e[2]}}</td>
-<td>{{e[3]}}</td>
-<td><a href="/delete/{{e[0]}}">❌</a></td>
-</tr>
-{% endfor %}
-
-</table>
-</div>
-
-<!-- FOOTER -->
-<div style="text-align:center;margin-top:15px;">
-<a href="/dashboard">🔄 Refresh</a> |
-<a href="/logout">🚪 Logout</a>
+    <form action="/add_income" method="post">
+        <input name="income" placeholder="Add income">
+        <button>Add Income</button>
+    </form>
 </div>
 
 </div>
 
-<!-- CHART SCRIPT -->
 <script>
-const income = {{income}};
-const expense = {{expense}};
-
-// BAR CHART
-new Chart(document.getElementById('barChart'), {
-    type: 'bar',
-    data: {
-        labels: ['Income', 'Expense'],
-        datasets: [{
-            label: '₹',
-            data: [income, expense],
-            backgroundColor: ['#2ecc71', '#e74c3c']
-        }]
-    }
+new Chart(barChart,{
+ type:'bar',
+ data:{
+  labels:['Feb','Mar','Apr','May','Jun','Jul'],
+  datasets:[
+   {label:'Income',data:{{ income_data }},backgroundColor:'#22c55e',borderRadius:8},
+   {label:'Expense',data:{{ expense_data }},backgroundColor:'#facc15',borderRadius:8}
+  ]
+ }
 });
 
-// DONUT CHART
-new Chart(document.getElementById('donutChart'), {
-    type: 'doughnut',
-    data: {
-        labels: ['Income', 'Expense'],
-        datasets: [{
-            data: [income, expense],
-            backgroundColor: ['#22c55e', '#ef4444']
-        }]
-    }
+new Chart(donutChart,{
+ type:'doughnut',
+ data:{
+  labels:{{ categories }},
+  datasets:[{
+   data:{{ amounts }},
+   backgroundColor:['#22c55e','#facc15','#38bdf8','#f87171','#a78bfa'],
+   cutout:'75%'
+  }]
+ }
 });
 </script>
 
