@@ -47,24 +47,39 @@
 </div>
 
 <script>
-new Chart(barChart,{
+const barCtx = document.getElementById('barChart').getContext('2d');
+const donutCtx = document.getElementById('donutChart').getContext('2d');
+
+new Chart(barCtx,{
  type:'bar',
  data:{
   labels:['Feb','Mar','Apr','May','Jun','Jul'],
   datasets:[
-   {label:'Income',data:{{ income_data }},backgroundColor:'#22c55e',borderRadius:8},
-   {label:'Expense',data:{{ expense_data }},backgroundColor:'#facc15',borderRadius:8}
+   {
+     label:'Income',
+     data: {{ income_data | tojson }},
+     backgroundColor:'#22c55e',
+     borderRadius:8
+   },
+   {
+     label:'Expense',
+     data: {{ expense_data | tojson }},
+     backgroundColor:'#facc15',
+     borderRadius:8
+   }
   ]
  }
 });
 
-new Chart(donutChart,{
+new Chart(donutCtx,{
  type:'doughnut',
  data:{
-  labels:{{ categories }},
+  labels: {{ categories | tojson }},
   datasets:[{
-   data:{{ amounts }},
-   backgroundColor:['#22c55e','#facc15','#38bdf8','#f87171','#a78bfa'],
+   data: {{ amounts | tojson }},
+   backgroundColor:[
+     '#22c55e','#facc15','#38bdf8','#f87171','#a78bfa'
+   ],
    cutout:'75%'
   }]
  }
