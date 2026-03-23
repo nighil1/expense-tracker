@@ -185,7 +185,7 @@ def dashboard():
                 (session["user_id"],))
     summary = cur.fetchall()
 
-    feedback = ai_feedback(income,expense)
+    feedback = ai_feedback(income, expense, summary, expenses)
 
     return render_template("dashboard.html",
         income=income, expense=expense,
