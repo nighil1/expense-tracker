@@ -72,18 +72,23 @@ model.fit(X, train_labels)
 def ai_category(text):
     text = text.lower().strip()
 
-    # fallback rule
-    if "book" in text or "pen" in text or "notebook" in text:
+    # Strong manual overrides (very important)
+    if any(x in text for x in ["book","pen","notebook","study","fees"]):
         return "Education"
+    if any(x in text for x in ["petrol","fuel","bus","train","uber","auto"]):
+        return "Transport"
+    if any(x in text for x in ["food","pizza","burger","coffee","eat"]):
+        return "Food"
+    if any(x in text for x in ["movie","netflix","game"]):
+        return "Entertainment"
+    if any(x in text for x in ["amazon","shopping","shirt","clothes"]):
+        return "Shopping"
+    if any(x in text for x in ["recharge","wifi","bill","electricity"]):
+        return "Utilities"
 
+    # ML fallback (no strict cutoff now)
     text_vec = vectorizer.transform([text])
-    probs = model.predict_proba(text_vec)[0]
-
-    if max(probs) < 0.4:
-        return "Other"
-
-    return model.classes_[probs.argmax()]
-
+    return model.predict(text_vec)[0]
 def ai_feedback(income, expense, summary, expenses):
     if income == 0:
         return "Add income to unlock AI insights."
