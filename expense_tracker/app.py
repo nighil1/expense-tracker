@@ -1,7 +1,11 @@
 from flask import Flask, render_template, request, redirect, session
 import sqlite3
 
-app = Flask(name)
+# ML
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import MultinomialNB
+
+app = Flask(__name__)
 app.secret_key = "secret123"
 
 def get_db():
@@ -34,29 +38,29 @@ def init_db():
 
 init_db()
 
-# AI Category
-def ai_category(text):
-# ===== REAL AI CATEGORY USING ML =====
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.naive_bayes import MultinomialNB
-
-# Training data (simple but effective)
+# ===== AI MODEL =====
 train_texts = [
-    "pizza burger food", "coffee snack restaurant",
-    "bus train petrol fuel uber",
-    "college fees books exam course",
-    "wifi recharge electricity bill",
-    "movie netflix game fun",
-    "amazon shopping clothes shirt"
+    "food pizza burger meal snack coffee tea",
+    "restaurant lunch dinner breakfast",
+    "bus train petrol fuel uber auto taxi",
+    "travel taxi fuel petrol",
+    "college fees book books exam course study",
+    "education tuition class book notebook",
+    "wifi recharge electricity bill data mobile",
+    "mobile recharge internet bill",
+    "movie netflix game fun entertainment",
+    "cinema gaming subscription",
+    "amazon shopping clothes shirt buy",
+    "flipkart purchase shopping clothes"
 ]
 
 train_labels = [
     "Food","Food",
-    "Transport",
-    "Education",
-    "Utilities",
-    "Entertainment",
-    "Shopping"
+    "Transport","Transport",
+    "Education","Education",
+    "Utilities","Utilities",
+    "Entertainment","Entertainment",
+    "Shopping","Shopping"
 ]
 
 vectorizer = CountVectorizer()
@@ -65,23 +69,27 @@ X = vectorizer.fit_transform(train_texts)
 model = MultinomialNB()
 model.fit(X, train_labels)
 
-
 def ai_category(text):
-    text_vec = vectorizer.transform([text.lower()])
-    return model.predict(text_vec)[0]
+    text = text.lower().strip()
+
+    # fallback rule
+    if "book" in text or "pen" in text or "notebook" in text:
+        return "Education"
+
+    text_vec = vectorizer.transform([text])
+    probs = model.predict_proba(text_vec)[0]
+
+    if max(probs) < 0.4:
+        return "Other"
+
+    return model.classes_[probs.argmax()]
 
 def ai_feedback(income, expense, summary, expenses):
     if income == 0:
         return "Add income to unlock AI insights."
 
     p = (expense / income) * 100
-
-    # Top category
     top_category = max(summary, key=lambda x: x[1])[0] if summary else "None"
-
-    # Spending trend (recent behavior)
-    recent = expenses[:3]  # last 3 expenses
-    recent_total = sum([e[1] for e in recent]) if recent else 0
 
     msg = ""
 
@@ -94,21 +102,8 @@ def ai_feedback(income, expense, summary, expenses):
 
     msg += f" Most spending is on {top_category}."
 
-    if recent_total > (income * 0.5):
-        msg += " Recent expenses are unusually high."
-
-    # Student advice
-    advice = {
-        "Food": "Try cooking or reducing outside food.",
-        "Entertainment": "Limit subscriptions and outings.",
-        "Shopping": "Avoid impulse buying.",
-        "Transport": "Use public transport to save money."
-    }
-
-    if top_category in advice:
-        msg += " " + advice[top_category]
-
     return msg
+
 # LOGIN
 @app.route("/", methods=["GET","POST"])
 def login():
@@ -170,31 +165,32 @@ def dashboard():
     expense_data = [em.get(m,0) for m in months]
     income_data = [im.get(m,0) for m in months]
 
-    # donut
-    cur.execute("SELECT category,SUM(amount) FROM expenses WHERE user_id=? GROUP BY category",
-                (session["user_id"],))
-    s = cur.fetchall()
-
-    # table
-    cur.execute("SELECT id,amount,description,category FROM expenses WHERE user_id=? ORDER BY date DESC",
-    (session["user_id"],))
-    expenses = cur.fetchall()
-
     # summary
     cur.execute("SELECT category,SUM(amount) FROM expenses WHERE user_id=? GROUP BY category",
                 (session["user_id"],))
     summary = cur.fetchall()
 
+    # expense table
+    cur.execute("SELECT id,amount,description,category FROM expenses WHERE user_id=? ORDER BY date DESC",
+                (session["user_id"],))
+    expenses = cur.fetchall()
+
+    # income list
+    cur.execute("SELECT id,amount FROM income WHERE user_id=? ORDER BY date DESC",
+                (session["user_id"],))
+    income_list = cur.fetchall()
+
     feedback = ai_feedback(income, expense, summary, expenses)
 
     return render_template("dashboard.html",
-        income=income, expense=expense,
-        income_data=income_data, expense_data=expense_data,
-        categories=[i[0] for i in s],
-        amounts=[i[1] for i in s],
-        feedback=feedback,
+        income=income,
+        expense=expense,
+        income_data=income_data,
+        expense_data=expense_data,
+        summary=summary,
         expenses=expenses,
-        summary=summary
+        income_list=income_list,
+        feedback=feedback
     )
 
 # ADD INCOME
@@ -207,12 +203,22 @@ def add_income():
     db.commit()
     return redirect("/dashboard")
 
-# DELETE
+# DELETE EXPENSE
 @app.route("/delete/<int:id>")
 def delete(id):
     db = get_db()
     cur = db.cursor()
     cur.execute("DELETE FROM expenses WHERE id=? AND user_id=?",
+                (id, session["user_id"]))
+    db.commit()
+    return redirect("/dashboard")
+
+# DELETE INCOME
+@app.route("/delete_income/<int:id>")
+def delete_income(id):
+    db = get_db()
+    cur = db.cursor()
+    cur.execute("DELETE FROM income WHERE id=? AND user_id=?",
                 (id, session["user_id"]))
     db.commit()
     return redirect("/dashboard")
@@ -223,4 +229,5 @@ def logout():
     session.clear()
     return redirect("/")
 
-app.run(debug=True)
+if __name__ == "__main__":
+    app.run(debug=True)
