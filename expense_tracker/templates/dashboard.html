@@ -4,10 +4,44 @@
     <title>Dashboard</title>
     <link rel="stylesheet" href="/static/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { background-color:#1f2937; color:white; font-family: Arial, sans-serif; margin:0; padding:0; }
+        .dashboard { max-width:1200px; margin:auto; padding:20px; }
+        .section { margin-bottom:30px; padding:15px; background-color:#111827; border-radius:8px; }
+        .section h3 { margin-top:0; }
+        table { width:100%; border-collapse:collapse; }
+        th, td { padding:10px; text-align:left; }
+        th { border-bottom:1px solid #374151; }
+        a { color:#f87171; text-decoration:none; }
+        a:hover { text-decoration:underline; }
+        input, button { padding:8px; margin:5px 0; border-radius:4px; border:none; }
+        button { background-color:#22c55e; color:white; cursor:pointer; }
+        .stats { display:flex; gap:20px; margin-bottom:30px; }
+        .card { flex:1; padding:20px; background-color:#111827; border-radius:8px; text-align:center; }
+        .profit { color:#22c55e; }
+        .loss { color:#ef4444; }
+        .alerts li { background-color: #f87171; color:white; padding:10px; margin-bottom:8px; border-radius:6px; font-weight:bold; }
+        .alerts { list-style:none; padding:0; margin:0; }
+        .center { text-align:center; }
+        form input { width:200px; }
+        canvas { background-color:#1f2937; border-radius:8px; padding:10px; }
+    </style>
 </head>
 <body>
 
 <div class="dashboard">
+
+    <!-- Alerts -->
+    {% if alerts %}
+    <div class="section">
+        <h3>⚠ Alerts</h3>
+        <ul class="alerts">
+            {% for alert in alerts %}
+            <li>{{ alert }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
 
     <!-- Add Income -->
     <div class="section">
@@ -22,10 +56,7 @@
         <h3>Income History</h3>
         <table>
             <thead>
-                <tr>
-                    <th>Amount</th>
-                    <th>Delete</th>
-                </tr>
+                <tr><th>Amount</th><th>Delete</th></tr>
             </thead>
             <tbody>
                 {% for i in income_list %}
@@ -47,45 +78,31 @@
         </form>
     </div>
 
-    <!-- Bar Chart -->
+    <!-- Monthly Overview (Bar Chart) -->
     <div class="section">
-        <h2>Monthly Overview</h2>
-        <canvas id="barChart"></canvas>
-    </div>
-
-    <!-- Stats -->
-    <div class="stats">
-        <div class="card">
-            <span>Income</span>
-            <strong>₹{{ income }}</strong>
-        </div>
-        <div class="card">
-            <span>Expense</span>
-            <strong>₹{{ expense }}</strong>
-        </div>
-        <div class="card">
-            <span>Balance</span>
-            <strong class="{{ 'profit' if income-expense>=0 else 'loss' }}">
-                ₹{{ income - expense }}
-            </strong>
+        <h3>Monthly Overview</h3>
+        <div style="overflow-x:auto;">
+            <div style="width:1200px;">
+                <canvas id="barChart"></canvas>
+            </div>
         </div>
     </div>
 
-    <!-- Donut -->
+    <!-- Income vs Expense (Donut Chart) -->
     <div class="section">
         <h3>Income vs Expense</h3>
         <canvas id="donutChart"></canvas>
     </div>
 
-    <!-- AI -->
+    <!-- AI Insight -->
     <div class="section">
         <h3>AI Insight</h3>
         <p>{{ feedback }}</p>
     </div>
 
-    <!-- Summary -->
+    <!-- Summary by Category -->
     <div class="section">
-        <h3>Summary</h3>
+        <h3>Summary by Category</h3>
         <ul>
             {% for s in summary %}
             <li>{{ s[0] }} - ₹{{ s[1] }}</li>
@@ -98,12 +115,7 @@
         <h3>Expenses</h3>
         <table>
             <thead>
-                <tr>
-                    <th>Amount</th>
-                    <th>Description</th>
-                    <th>Category</th>
-                    <th>Delete</th>
-                </tr>
+                <tr><th>Amount</th><th>Description</th><th>Category</th><th>Delete</th></tr>
             </thead>
             <tbody>
                 {% for e in expenses %}
@@ -132,28 +144,17 @@ const donutCtx = document.getElementById('donutChart');
 new Chart(barCtx,{
  type:'bar',
  data:{
-  labels:['Feb','Mar','Apr','May','Jun','Jul'],
+  labels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
   datasets:[
-   {
-    label:'Income',
-    data:{{ income_data|tojson }},
-    backgroundColor:'#22c55e',
-    borderRadius:6
-   },
-   {
-    label:'Expense',
-    data:{{ expense_data|tojson }},
-    backgroundColor:'#facc15',
-    borderRadius:6
-   }
+   { label:'Income', data:{{ income_data|tojson }}, backgroundColor:'#22c55e', borderRadius:6 },
+   { label:'Expense', data:{{ expense_data|tojson }}, backgroundColor:'#facc15', borderRadius:6 }
   ]
  },
  options:{
+  responsive:true,
+  maintainAspectRatio:false,
   plugins:{ legend:{ labels:{ color:'white' }}},
-  scales:{
-   x:{ ticks:{ color:'white' }},
-   y:{ ticks:{ color:'white' }}
-  }
+  scales:{ x:{ ticks:{ color:'white' }}, y:{ ticks:{ color:'white' }}}
  }
 });
 
@@ -161,17 +162,11 @@ new Chart(donutCtx,{
  type:'doughnut',
  data:{
   labels:['Income','Expense'],
-  datasets:[{
-   data:[{{ income }}, {{ expense }}],
-   backgroundColor:['#22c55e','#ef4444'],
-   cutout:'70%'
-  }]
+  datasets:[{ data:[{{ income }}, {{ expense }}], backgroundColor:['#22c55e','#ef4444'], cutout:'70%' }]
  },
- options:{
-  plugins:{ legend:{ labels:{ color:'white' }}}
- }
+ options:{ plugins:{ legend:{ labels:{ color:'white' }}} }
 });
 </script>
 
 </body>
-    </html>
+        </html>
