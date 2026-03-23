@@ -21,12 +21,20 @@
     <div class="section">
         <h3>Income History</h3>
         <table>
-            {% for i in income_list %}
-            <tr>
-                <td>₹{{ i[1] }}</td>
-                <td><a href="/delete_income/{{ i[0] }}">X</a></td>
-            </tr>
-            {% endfor %}
+            <thead>
+                <tr>
+                    <th>Amount</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in income_list %}
+                <tr>
+                    <td>₹{{ i[1] }}</td>
+                    <td><a href="/delete_income/{{ i[0] }}">X</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
         </table>
     </div>
 
@@ -39,23 +47,28 @@
         </form>
     </div>
 
-    <!-- Chart -->
+    <!-- Bar Chart -->
     <div class="section">
+        <h2>Monthly Overview</h2>
         <canvas id="barChart"></canvas>
     </div>
 
     <!-- Stats -->
-    <div class="section stat">
-        <span>Income</span><strong>₹{{ income }}</strong>
-    </div>
-
-    <div class="section stat">
-        <span>Expense</span><strong>₹{{ expense }}</strong>
-    </div>
-
-    <div class="section stat">
-        <span>Balance</span>
-        <strong>₹{{ income - expense }}</strong>
+    <div class="stats">
+        <div class="card">
+            <span>Income</span>
+            <strong>₹{{ income }}</strong>
+        </div>
+        <div class="card">
+            <span>Expense</span>
+            <strong>₹{{ expense }}</strong>
+        </div>
+        <div class="card">
+            <span>Balance</span>
+            <strong class="{{ 'profit' if income-expense>=0 else 'loss' }}">
+                ₹{{ income - expense }}
+            </strong>
+        </div>
     </div>
 
     <!-- Donut -->
@@ -66,11 +79,13 @@
 
     <!-- AI -->
     <div class="section">
+        <h3>AI Insight</h3>
         <p>{{ feedback }}</p>
     </div>
 
     <!-- Summary -->
     <div class="section">
+        <h3>Summary</h3>
         <ul>
             {% for s in summary %}
             <li>{{ s[0] }} - ₹{{ s[1] }}</li>
@@ -78,21 +93,33 @@
         </ul>
     </div>
 
-    <!-- Expense Table -->
+    <!-- Expenses -->
     <div class="section">
+        <h3>Expenses</h3>
         <table>
-            {% for e in expenses %}
-            <tr>
-                <td>₹{{ e[1] }}</td>
-                <td>{{ e[2] }}</td>
-                <td>{{ e[3] }}</td>
-                <td><a href="/delete/{{ e[0] }}">X</a></td>
-            </tr>
-            {% endfor %}
+            <thead>
+                <tr>
+                    <th>Amount</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for e in expenses %}
+                <tr>
+                    <td>₹{{ e[1] }}</td>
+                    <td>{{ e[2] }}</td>
+                    <td>{{ e[3] }}</td>
+                    <td><a href="/delete/{{ e[0] }}">X</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
         </table>
     </div>
 
-    <div class="section">
+    <!-- Logout -->
+    <div class="section center">
         <a href="/logout">Logout</a>
     </div>
 
@@ -107,9 +134,26 @@ new Chart(barCtx,{
  data:{
   labels:['Feb','Mar','Apr','May','Jun','Jul'],
   datasets:[
-   {label:'Income',data:{{ income_data|tojson }},backgroundColor:'#22c55e'},
-   {label:'Expense',data:{{ expense_data|tojson }},backgroundColor:'#facc15'}
+   {
+    label:'Income',
+    data:{{ income_data|tojson }},
+    backgroundColor:'#22c55e',
+    borderRadius:6
+   },
+   {
+    label:'Expense',
+    data:{{ expense_data|tojson }},
+    backgroundColor:'#facc15',
+    borderRadius:6
+   }
   ]
+ },
+ options:{
+  plugins:{ legend:{ labels:{ color:'white' }}},
+  scales:{
+   x:{ ticks:{ color:'white' }},
+   y:{ ticks:{ color:'white' }}
+  }
  }
 });
 
@@ -118,12 +162,16 @@ new Chart(donutCtx,{
  data:{
   labels:['Income','Expense'],
   datasets:[{
-   data:[{{ income }},{{ expense }}],
-   backgroundColor:['#22c55e','#ef4444']
+   data:[{{ income }}, {{ expense }}],
+   backgroundColor:['#22c55e','#ef4444'],
+   cutout:'70%'
   }]
+ },
+ options:{
+  plugins:{ legend:{ labels:{ color:'white' }}}
  }
 });
 </script>
 
 </body>
-                                  </html>
+    </html>
