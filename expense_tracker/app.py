@@ -43,7 +43,8 @@ train_texts = [
     "food pizza burger meal snack coffee tea",
     "restaurant lunch dinner breakfast",
     "bus train petrol fuel uber auto taxi",
-    "travel taxi fuel petrol",
+    "travel taxi fuel petrol","bike petrol fuel ride",
+"medicine drug hospital doctor",
     "college fees book books exam course study",
     "education tuition class book notebook",
     "wifi recharge electricity bill data mobile",
@@ -56,7 +57,7 @@ train_texts = [
 
 train_labels = [
     "Food","Food",
-    "Transport","Transport",
+    "Transport","Transport","Medical",
     "Education","Education",
     "Utilities","Utilities",
     "Entertainment","Entertainment",
@@ -72,23 +73,45 @@ model.fit(X, train_labels)
 def ai_category(text):
     text = text.lower().strip()
 
-    # Strong manual overrides (very important)
-    if any(x in text for x in ["book","pen","notebook","study","fees"]):
+    # ===== STRONG RULE-BASED AI (PRIMARY) =====
+    
+    # Education
+    if any(x in text for x in ["book","pen","notebook","study","fees","exam","college"]):
         return "Education"
-    if any(x in text for x in ["petrol","fuel","bus","train","uber","auto"]):
+
+    # Transport
+    if any(x in text for x in ["petrol","fuel","bus","train","uber","auto","bike","travel"]):
         return "Transport"
-    if any(x in text for x in ["food","pizza","burger","coffee","eat"]):
+
+    # Food
+    if any(x in text for x in ["food","pizza","burger","coffee","eat","meal"]):
         return "Food"
-    if any(x in text for x in ["movie","netflix","game"]):
+
+    # Entertainment
+    if any(x in text for x in ["movie","netflix","game","fun"]):
         return "Entertainment"
-    if any(x in text for x in ["amazon","shopping","shirt","clothes"]):
+
+    # Shopping
+    if any(x in text for x in ["amazon","shopping","shirt","clothes","buy"]):
         return "Shopping"
-    if any(x in text for x in ["recharge","wifi","bill","electricity"]):
+
+    # Utilities
+    if any(x in text for x in ["recharge","wifi","bill","electricity","data"]):
         return "Utilities"
 
-    # ML fallback (no strict cutoff now)
+    # Medical (NEW CATEGORY)
+    if any(x in text for x in ["medicine","drug","hospital","doctor","tablet"]):
+        return "Medical"
+
+    # ===== ML FALLBACK =====
     text_vec = vectorizer.transform([text])
-    return model.predict(text_vec)[0]
+    probs = model.predict_proba(text_vec)[0]
+
+    # If low confidence → Other
+    if max(probs) < 0.5:
+        return "Other"
+
+    return model.classes_[probs.argmax()]
 def ai_feedback(income, expense, summary, expenses):
     if income == 0:
         return "Add income to unlock AI insights."
