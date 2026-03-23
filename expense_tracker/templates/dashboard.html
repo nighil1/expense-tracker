@@ -17,6 +17,19 @@
         </form>
     </div>
 
+    <!-- Income History -->
+    <div class="section">
+        <h3>Income History</h3>
+        <table>
+            {% for i in income_list %}
+            <tr>
+                <td>₹{{ i[1] }}</td>
+                <td><a href="/delete_income/{{ i[0] }}">X</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
     <!-- Add Expense -->
     <div class="section">
         <form method="post">
@@ -28,7 +41,6 @@
 
     <!-- Chart -->
     <div class="section">
-        <h2>Monthly Overview</h2>
         <canvas id="barChart"></canvas>
     </div>
 
@@ -43,66 +55,52 @@
 
     <div class="section stat">
         <span>Balance</span>
-        <strong style="color: {{ 'lightgreen' if income-expense >= 0 else 'red' }}">
-            ₹{{ income - expense }}
-        </strong>
+        <strong>₹{{ income - expense }}</strong>
     </div>
 
     <!-- Donut -->
     <div class="section">
-        <h3>Expense Distribution</h3>
+        <h3>Income vs Expense</h3>
         <canvas id="donutChart"></canvas>
     </div>
 
     <!-- AI -->
     <div class="section">
-        <h3>AI Insight</h3>
         <p>{{ feedback }}</p>
     </div>
 
     <!-- Summary -->
     <div class="section">
-        <h3>Summary</h3>
         <ul>
             {% for s in summary %}
-                <li>{{ s[0] }} - ₹{{ s[1] }}</li>
+            <li>{{ s[0] }} - ₹{{ s[1] }}</li>
             {% endfor %}
         </ul>
     </div>
 
-    <!-- Table -->
+    <!-- Expense Table -->
     <div class="section">
-        <h3>Expenses</h3>
-        <table style="width:100%; border-collapse:collapse;">
-            <tr style="background:#22c55e;color:black;">
-                <th>Amt</th>
-                <th>Desc</th>
-                <th>Cat</th>
-                <th>Delete</th>
-            </tr>
-
+        <table>
             {% for e in expenses %}
-            <tr style="text-align:center;">
+            <tr>
                 <td>₹{{ e[1] }}</td>
                 <td>{{ e[2] }}</td>
                 <td>{{ e[3] }}</td>
-                <td><a href="/delete/{{ e[0] }}" style="color:red;">X</a></td>
+                <td><a href="/delete/{{ e[0] }}">X</a></td>
             </tr>
             {% endfor %}
         </table>
     </div>
 
-    <!-- Actions -->
-    <div class="section" style="text-align:center;">
-        <a href="/dashboard" style="color:#22c55e;">Refresh</a> |
-        <a href="/logout" style="color:#22c55e;">Logout</a>
+    <div class="section">
+        <a href="/logout">Logout</a>
     </div>
 
 </div>
 
 <script>
-const barCtx = document.getElementById('barChart').getContext('2d');
-const donutCtx = document.getElementById('donutChart').getContext('2d');
+const barCtx = document.getElementById('barChart');
+const donutCtx = document.getElementById('donutChart');
 
 new Chart(barCtx,{
  type:'bar',
@@ -118,15 +116,14 @@ new Chart(barCtx,{
 new Chart(donutCtx,{
  type:'doughnut',
  data:{
-  labels:{{ categories|tojson }},
+  labels:['Income','Expense'],
   datasets:[{
-   data:{{ amounts|tojson }},
-   backgroundColor:['#22c55e','#facc15','#38bdf8','#f87171','#a78bfa'],
-   cutout:'75%'
+   data:[{{ income }},{{ expense }}],
+   backgroundColor:['#22c55e','#ef4444']
   }]
  }
 });
 </script>
 
 </body>
-    </html>
+                                  </html>
