@@ -167,8 +167,8 @@ def generate_report(user_id, period='week'):
 
 # ===================== EMAIL =====================
 def send_email(to_email, subject, body):
-    from_email = "your_email@gmail.com"
-    password = "your_app_password"  # Use app password for Gmail
+    from_email = "ai.expense.tracker11@gmail.com"
+    password = "ccfi suek bpzv genw"  # Use app password for Gmail
     msg = MIMEText(body)
     msg['Subject'] = subject
     msg['From'] = from_email
