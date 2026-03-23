@@ -36,32 +36,79 @@ init_db()
 
 # AI Category
 def ai_category(text):
-    text = text.lower()
-    rules = {
-        "Food":["food","pizza","coffee"],
-        "Transport":["bus","train","petrol"],
-        "Education":["fees","book","college"],
-        "Utilities":["wifi","recharge","bill"],
-        "Entertainment":["movie","game"],
-        "Shopping":["amazon","shirt"]
-    }
-    for c,w in rules.items():
-        for i in w:
-            if i in text:
-                return c
-    return "Other"
+# ===== REAL AI CATEGORY USING ML =====
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import MultinomialNB
 
-# AI Insight
-def ai_feedback(income, expense):
+# Training data (simple but effective)
+train_texts = [
+    "pizza burger food", "coffee snack restaurant",
+    "bus train petrol fuel uber",
+    "college fees books exam course",
+    "wifi recharge electricity bill",
+    "movie netflix game fun",
+    "amazon shopping clothes shirt"
+]
+
+train_labels = [
+    "Food","Food",
+    "Transport",
+    "Education",
+    "Utilities",
+    "Entertainment",
+    "Shopping"
+]
+
+vectorizer = CountVectorizer()
+X = vectorizer.fit_transform(train_texts)
+
+model = MultinomialNB()
+model.fit(X, train_labels)
+
+
+def ai_category(text):
+    text_vec = vectorizer.transform([text.lower()])
+    return model.predict(text_vec)[0]
+
+def ai_feedback(income, expense, summary, expenses):
     if income == 0:
-        return "Add income to unlock insights."
-    p = (expense/income)*100
-    if p > 90:
-        return "⚠ Spending is very high this month."
-    elif p > 70:
-        return "You are close to your spending limit."
-    return "Great control. Spending looks healthy."
+        return "Add income to unlock AI insights."
 
+    p = (expense / income) * 100
+
+    # Top category
+    top_category = max(summary, key=lambda x: x[1])[0] if summary else "None"
+
+    # Spending trend (recent behavior)
+    recent = expenses[:3]  # last 3 expenses
+    recent_total = sum([e[1] for e in recent]) if recent else 0
+
+    msg = ""
+
+    if p > 90:
+        msg = "⚠ You are overspending heavily."
+    elif p > 70:
+        msg = "You are close to your limit."
+    else:
+        msg = "Spending is under control."
+
+    msg += f" Most spending is on {top_category}."
+
+    if recent_total > (income * 0.5):
+        msg += " Recent expenses are unusually high."
+
+    # Student advice
+    advice = {
+        "Food": "Try cooking or reducing outside food.",
+        "Entertainment": "Limit subscriptions and outings.",
+        "Shopping": "Avoid impulse buying.",
+        "Transport": "Use public transport to save money."
+    }
+
+    if top_category in advice:
+        msg += " " + advice[top_category]
+
+    return msg
 # LOGIN
 @app.route("/", methods=["GET","POST"])
 def login():
